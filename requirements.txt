@@ -1,0 +1,10 @@
+tqdm
+gym
+wandb
+tensorboard
+opencv-contrib-python
+pyglet
+numpy==1.19.3
+--extra-index-url https://download.pytorch.org/whl/cu113
+torch==1.12.0+cu113
+torchvision==0.13.0+cu113
