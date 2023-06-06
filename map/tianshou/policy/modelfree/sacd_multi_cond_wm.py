@@ -491,7 +491,7 @@ class SACDMultiCondWMPolicy(BasePolicy):
             obs_mask = to_torch(~np.all(obs_n == 0, axis=1), device=self.world_models[i].device, dtype=torch.float)
             pred_losses *= obs_mask
             wm_loss = torch.mean(pred_losses)
-            print('wm_loss', wm_loss)
+            #print('wm_loss', wm_loss)
             
             self.wm_optims[i].zero_grad()
             wm_loss.backward()

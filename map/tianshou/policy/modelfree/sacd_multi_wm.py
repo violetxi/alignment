@@ -308,6 +308,7 @@ class SACDMultiWMPolicy(BasePolicy):
                     raise NotImplementedError
 
         intr_rew = 1 / (batch.obs.shape[-1]) * intr_rew
+        #print('intr_rew.shape', intr_rew.shape)
 
         output = {}
         for i in range(self.num_adv, num_agents):

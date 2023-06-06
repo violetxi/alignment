@@ -25,7 +25,6 @@ from tianshou.policy import (
 )
 from tianshou.data import Collector
 
-
 def get_args():
     parser = argparse.ArgumentParser()
 
