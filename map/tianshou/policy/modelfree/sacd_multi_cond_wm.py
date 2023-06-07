@@ -259,10 +259,13 @@ class SACDMultiCondWMPolicy(BasePolicy):
         else:
             if self.intr_rew_options == 'elign_both': # intr rew from both both
                 j_list = list(range(num_agents))
+                conditional_agent_ids = np.array(list(range(num_agents))*batch_size).reshape(num_agents*batch_size,1)
             elif self.intr_rew_options == 'elign_team' or self.intr_rew_options == 'curio_team': # intr rew from good agts only
                 j_list = list(range(self.num_adv, num_agents))
+                conditional_agent_ids = np.array(list(range(self.num_adv, num_agents))*batch_size).reshape((num_agents-self.num_adv)*batch_size,1)
             elif self.intr_rew_options == 'elign_adv': # intr rew from adversaries only
                 j_list = list(range(0, self.num_adv))
+                conditional_agent_ids = np.array(list(range(0,self.num_adv))*batch_size).reshape(self.num_adv*batch_size,1)
             else:
                 print("Invalid intr rew options.")
                 raise NotImplementedError
@@ -287,7 +290,7 @@ class SACDMultiCondWMPolicy(BasePolicy):
                 #print('numpy inputs.shape:', inputs.shape)
 
                 # add the agent ids as a conditional input
-                conditional_agent_ids = np.array(list(range(self.num_adv, num_agents))*batch_size).reshape((num_agents-self.num_adv)*batch_size,1)
+                #conditional_agent_ids = np.array(list(range(self.num_adv, num_agents))*batch_size).reshape((num_agents-self.num_adv)*batch_size,1)
                 #print('numpy conditional_agent_ids.shape:', conditional_agent_ids.shape)
                 
                 inputs = np.concatenate((inputs, conditional_agent_ids), axis=1) 
@@ -424,12 +427,16 @@ class SACDMultiCondWMPolicy(BasePolicy):
         # for training world models
         num_agents = self.total_num_agt # num actors and num agents are synonymous
         #print("num agents: ", num_agents)
+        batch_size = batch.obs.shape[0]
         if self.intr_rew_options == 'elign_both': # intr rew from both both
             j_list = list(range(num_agents))
+            conditional_agent_ids = np.array(list(range(num_agents))*batch_size).reshape(num_agents*batch_size,1)
         elif self.intr_rew_options == 'elign_team' or self.intr_rew_options == 'curio_team': # intr rew from good agts only
             j_list = list(range(self.num_adv, num_agents))
+            conditional_agent_ids = np.array(list(range(self.num_adv, num_agents))*batch_size).reshape((num_agents-self.num_adv)*batch_size,1)
         elif self.intr_rew_options == 'elign_adv': # intr rew from adversaries only
             j_list = list(range(0, self.num_adv))
+            conditional_agent_ids = np.array(list(range(0,self.num_adv))*batch_size).reshape(self.num_adv*batch_size,1)
         else:
             print("Invalid intr rew options.")
             raise NotImplementedError
@@ -475,7 +482,6 @@ class SACDMultiCondWMPolicy(BasePolicy):
             actor_optim.step()
 
             ########### Start Train conditional world model ###############################
-            batch_size = batch.obs.shape[0]
             obs_j_list, _ = self.imagine_agent_j_obs(batch.obs[:,i], i, j_list)
             obs_n = np.concatenate(obs_j_list, axis=0) 
             act_n = np.concatenate([batch.act[:,i]] * len(j_list), axis=0) 
@@ -483,7 +489,7 @@ class SACDMultiCondWMPolicy(BasePolicy):
             #print('inputs.shape: ', inputs.shape)
             # add the agent ids as a conditional input
             #conditional_agent_ids = np.array(list(range(num_agents))*batch_size).reshape(num_agents*batch_size,1)
-            conditional_agent_ids = np.array(list(range(self.num_adv, num_agents))*batch_size).reshape((num_agents-self.num_adv)*batch_size,1)
+            #conditional_agent_ids = np.array(list(range(self.num_adv, num_agents))*batch_size).reshape((num_agents-self.num_adv)*batch_size,1)
             #print('conditional_agent_ids.shape: ', conditional_agent_ids.shape)
             inputs = np.concatenate((inputs, conditional_agent_ids), axis=1) 
             #print('concat inputs.shape: ', inputs.shape)
