@@ -287,8 +287,11 @@ class SACDMultiCondWMPolicy(BasePolicy):
                 #print('numpy inputs.shape:', inputs.shape)
 
                 # add the agent ids as a conditional input
-                conditional_agent_ids = np.array(list(range(num_agents))*batch_size).reshape(num_agents*batch_size,1)
+                conditional_agent_ids = np.array(list(range(self.num_adv, num_agents))*batch_size).reshape((num_agents-self.num_adv)*batch_size,1)
+                #print('numpy conditional_agent_ids.shape:', conditional_agent_ids.shape)
+                
                 inputs = np.concatenate((inputs, conditional_agent_ids), axis=1) 
+                #print('numpy concatenated inputs.shape:', inputs.shape)
 
                 inputs = to_torch(inputs, device=self.world_models[i].device, dtype=torch.float)
                 #print('torch inputs.shape:', inputs.shape)
@@ -419,8 +422,8 @@ class SACDMultiCondWMPolicy(BasePolicy):
         total_returns = np.zeros(len(self.actors))
 
         # for training world models
-        num_agents = len(self.actors) # num actors and num agents are synonymous
-        print("num agents: ", num_agents)
+        num_agents = self.total_num_agt # num actors and num agents are synonymous
+        #print("num agents: ", num_agents)
         if self.intr_rew_options == 'elign_both': # intr rew from both both
             j_list = list(range(num_agents))
         elif self.intr_rew_options == 'elign_team' or self.intr_rew_options == 'curio_team': # intr rew from good agts only
@@ -432,6 +435,7 @@ class SACDMultiCondWMPolicy(BasePolicy):
             raise NotImplementedError
 
         for i in range(len(self.actors)):
+            #print('len(self.actors): ', len(self.actors))
             actor = self.actors[i]
             actor_optim = self.actor_optims[i]
 
@@ -476,10 +480,15 @@ class SACDMultiCondWMPolicy(BasePolicy):
             obs_n = np.concatenate(obs_j_list, axis=0) 
             act_n = np.concatenate([batch.act[:,i]] * len(j_list), axis=0) 
             inputs = np.concatenate((obs_n, np.expand_dims(act_n, axis=-1)), axis=1) 
+            #print('inputs.shape: ', inputs.shape)
             # add the agent ids as a conditional input
-            conditional_agent_ids = np.array(list(range(num_agents))*batch_size).reshape(num_agents*batch_size,1)
+            #conditional_agent_ids = np.array(list(range(num_agents))*batch_size).reshape(num_agents*batch_size,1)
+            conditional_agent_ids = np.array(list(range(self.num_adv, num_agents))*batch_size).reshape((num_agents-self.num_adv)*batch_size,1)
+            #print('conditional_agent_ids.shape: ', conditional_agent_ids.shape)
             inputs = np.concatenate((inputs, conditional_agent_ids), axis=1) 
+            #print('concat inputs.shape: ', inputs.shape)
             inputs = to_torch(inputs, device=self.world_models[i].device, dtype=torch.float)
+            #print('torch inputs.shape: ', inputs.shape)
             # duplicate obs_next_i j times and concatenate them as the ground truth
             true_next_obs_n = np.concatenate([batch.obs_next[:,i]] * len(j_list), axis=0) #(bs*j, obs_dim)
             true_next_obs_n = to_torch(true_next_obs_n, device=self.world_models[i].device, dtype=torch.float)

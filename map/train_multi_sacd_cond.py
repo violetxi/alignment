@@ -74,9 +74,9 @@ def get_args():
     parser.add_argument('--n-step', type=int, default=1)
 
     # Task specific
-    parser.add_argument('--num-good-agents', type=int, default=5) #0
+    parser.add_argument('--num-good-agents', type=int, default=0) 
     parser.add_argument('--num-adversaries', type=int, default=0)
-    parser.add_argument('--obs-radius', type=float, default=0.5) # float('inf')
+    parser.add_argument('--obs-radius', type=float, default=float('inf')) 
     parser.add_argument('--amb-init', type=int, default=0)
     parser.add_argument('--rew-shape', action='store_true', default=False)
 
