@@ -103,8 +103,8 @@ def offpolicy_trainer(
                 for i in range(min(
                         result['n/st'] // collect_per_step, t.total - t.n)):
                     global_step += 1
-                    sample_batch, intr_rews, indice = train_collector.sample(batch_size)
-                    losses = policy.learn(sample_batch, indice)
+                    sample_batch, intr_rews, _ = train_collector.sample(batch_size)
+                    losses = policy.learn(sample_batch)
                     for k in result.keys():
                         data[k] = f'{result[k]:.2f}'
                         if writer and global_step % log_interval == 0:
@@ -122,7 +122,7 @@ def offpolicy_trainer(
                         data[k] = f'{intr_rews[k]:.2f}'
                         if writer and global_step % log_interval == 0:
                             writer.add_scalar(
-                                k, intr_rews[k], global_step=global_step)
+                                k, intr_rews[k], global_step=global_step)                            
                     t.update(1)
                     t.set_postfix(**data)
             if t.n <= t.total:

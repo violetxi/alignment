@@ -70,7 +70,6 @@ class SACDMultiWMPolicy(BasePolicy):
                  grads_logging: bool = False,
                  **kwargs) -> None:
         super().__init__(**kwargs)
-        print("Im a boomer")
         assert 0 <= tau <= 1, 'tau should in [0, 1]'
         self._tau = tau
         assert 0 <= gamma <= 1, 'gamma should in [0, 1]'

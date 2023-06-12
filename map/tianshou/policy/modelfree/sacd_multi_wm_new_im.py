@@ -397,7 +397,7 @@ class SACDMultiWMPolicyNewIM(BasePolicy):
             target_qs = torch.cat(target_qs, dim=1)
         return target_qs
 
-    def learn(self, batch: Batch, indice: np.array, **kwargs) -> Dict[str, float]:        
+    def learn(self, batch: Batch, **kwargs) -> Dict[str, float]:        
         total_actor_loss = np.zeros(len(self.actors))
         total_critic1_loss = np.zeros(len(self.critic1s))
         total_critic2_loss = np.zeros(len(self.critic2s))

@@ -64,7 +64,7 @@ def get_args():
     # Model arguments
     parser.add_argument('--layer-num', type=int, default=2)
     parser.add_argument('--wm_hidden_size', type=int, default=128)
-    parser.add_argument('--centralized', action='store_true', default=False)    
+    parser.add_argument('--centralized', action='store_true', default=False)
 
     # SAC special
     parser.add_argument('--tau', type=float, default=0.01)
