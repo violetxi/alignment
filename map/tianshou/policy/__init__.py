@@ -7,6 +7,9 @@ from tianshou.policy.modelfree.sacd_multi_cc import SACDMultiCCPolicy
 from tianshou.policy.modelfree.sacd_multi_wm import SACDMultiWMPolicy
 from tianshou.policy.modelfree.sacd_multi_cc_wm import SACDMultiCCWMPolicy
 
+# different IM
+from tianshou.policy.modelfree.sacd_multi_wm_new_im import SACDMultiWMPolicyNewIM
+
 
 __all__ = [
     'BasePolicy',
@@ -16,4 +19,5 @@ __all__ = [
     'SACDMultiCCPolicy',
     'SACDMultiWMPolicy',
     'SACDMultiCCWMPolicy',
+    'SACDMultiWMPolicyNewIM'
 ]

@@ -510,4 +510,4 @@ class Collector(object):
             # batch_data = self.process_fn(batch_data, self.buffer, indice,
             #                              global_step=global_step)
             batch_data, intr_rews = self.process_fn(batch_data, self.buffer, indice)
-        return batch_data, intr_rews
+        return batch_data, intr_rews, indice

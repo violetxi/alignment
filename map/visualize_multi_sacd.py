@@ -29,7 +29,7 @@ def get_args():
     parser.add_argument('--final-model', action='store_true', default=False)
     parser.add_argument('--seed', type=int, default=0)
     parser.add_argument('--logdir', type=str, default='log')
-    parser.add_argument('--render', type=float, default=0.01)
+    parser.add_argument('--render', type=float, default=0.01)    
     parser.add_argument('--num-render', type=int, default=2)
     parser.add_argument(
         '--device', type=str,
