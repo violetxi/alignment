@@ -7,6 +7,7 @@ from tianshou.policy.modelfree.sacd_multi_cc import SACDMultiCCPolicy
 from tianshou.policy.modelfree.sacd_multi_wm import SACDMultiWMPolicy
 from tianshou.policy.modelfree.sacd_multi_cc_wm import SACDMultiCCWMPolicy
 from tianshou.policy.modelfree.sacd_multi_cond_wm import SACDMultiCondWMPolicy
+from tianshou.policy.modelfree.sacd_multi_embed_cond_wm import SACDMultiEmbedCondWMPolicy
 
 
 __all__ = [
@@ -18,4 +19,5 @@ __all__ = [
     'SACDMultiWMPolicy',
     'SACDMultiCCWMPolicy',
     'SACDMultiCondWMPolicy',
+    'SACDMultiEmbedCondWMPolicy',
 ]
