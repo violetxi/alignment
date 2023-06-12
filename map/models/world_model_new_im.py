@@ -8,13 +8,12 @@ from torch.optim import Adam
 from tianshou.data import to_torch, Batch
 
 class WorldModelNewIM(nn.Module):
-    def __init__(self, num_agent, layer_num, state_shape, memory_size, hidden_units=128, device='cpu', wm_noise_level=0.0):
+    def __init__(self, num_agent, layer_num, state_shape, hidden_units=128, device='cpu', wm_noise_level=0.0):
         super().__init__()
         self.device = device
-        self.memory_size = memory_size
         # plus one for the action
         self.model = [
-            nn.Linear((np.prod(state_shape) + 1) * self.memory_size, hidden_units),
+            nn.Linear(np.prod(state_shape) + 1, hidden_units),
             nn.ReLU()]
         for i in range(layer_num - 1):
             self.model += [nn.Linear(hidden_units, hidden_units), nn.ReLU()]

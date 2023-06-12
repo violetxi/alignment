@@ -64,9 +64,7 @@ def get_args():
     # Model arguments
     parser.add_argument('--layer-num', type=int, default=2)
     parser.add_argument('--wm_hidden_size', type=int, default=128)
-    parser.add_argument('--centralized', action='store_true', default=False)
-    # NewIM WM arguments
-    parser.add_argument('--wm_memory_size', type=int, default=10)
+    parser.add_argument('--centralized', action='store_true', default=False)    
 
     # SAC special
     parser.add_argument('--tau', type=float, default=0.01)
@@ -169,7 +167,7 @@ def train_multi_sacd(args=get_args()):
     # World Model
     #if args.intr_rew == 'new_im':
     if 'new_im' in args.intr_rew:
-        world_models = [WorldModelNewIM(num_agents, args.layer_num, args.state_shape, args.wm_memory_size, args.wm_hidden_size, device=args.device, wm_noise_level=args.wm_noise_level).to(args.device)
+        world_models = [WorldModelNewIM(num_agents, args.layer_num, args.state_shape, args.wm_hidden_size, device=args.device, wm_noise_level=args.wm_noise_level).to(args.device)
                         for i in range(num_agents)]
     else:
         world_models = [WorldModel(num_agents, args.layer_num, args.state_shape, args.wm_hidden_size, device=args.device, wm_noise_level=args.wm_noise_level).to(args.device)

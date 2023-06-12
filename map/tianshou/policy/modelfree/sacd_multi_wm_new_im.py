@@ -104,10 +104,7 @@ class SACDMultiWMPolicyNewIM(BasePolicy):
         self.obs_radii = obs_radii 
         self.partial_obs = max(self.obs_radii) < float('inf')
         self.grads_logging = grads_logging
-        self.max_error = 0
-        # story history of imagine j agents' observations
-        #self.history_buffer = [[] for _ in range(self.total_num_agt - self.num_adv)]    
-        self.history_buffer = [[] for _ in range(self.total_num_agt)]
+        self.max_error = 0        
         
     def save(self, logdir, type="best"):
         for prefix, models in self.model_list:
@@ -234,13 +231,6 @@ class SACDMultiWMPolicyNewIM(BasePolicy):
 
         return obs_j_list, sum_obs_percents
 
-    # init random history for each agent including their obs and actions
-    def init_random_history(self, batch_size, memory_size, obs_size):
-        for i in range(len(self.history_buffer)):
-            for n in range(memory_size):
-                history = np.random.normal(size=(batch_size * 5, obs_size + 1))
-                self.history_buffer[i].append(history)
-
     def generate_random_tgt_reward(self):
         return np.random.normal()
 
@@ -281,31 +271,19 @@ class SACDMultiWMPolicyNewIM(BasePolicy):
                 raise NotImplementedError
             # for debugging purporses
             # inter_obs_percents = np.zeros((batch_size, num_agents))
-            # inter_freqs = np.zeros((batch_size, num_agents))
-
-            # init history buffer
-            self.wm_memory_size = self.world_models[0].memory_size
-            if not len(self.history_buffer[0]):
-                self.init_random_history(batch_size, self.wm_memory_size, obs_size)
-            # geneerateee random reward
-            if 'new_im' in self.intr_rew_options:
-                self.random_target_rew = self.generate_random_tgt_reward()
-                print(self.random_target_rew)
-
+            # inter_freqs = np.zeros((batch_size, num_agents)) 
+            # 
+            self.random_target_rew = self.generate_random_tgt_reward() 
             for i in range(self.num_adv, num_agents): # apply intr rew only on good agents
                 # obs_j_list: [(bs, obs_dim) * j]
                 obs_j_list, sum_obs_percents = self.imagine_agent_j_obs(batch.obs[:,i], i, j_list)
-                #breakpoint()
+                
                 # obs_n: (bs*j, obs_dim)
-                obs_n = np.concatenate(obs_j_list, axis=0) #(bs*j, obs_dim), where j = len(j_list)                
-                act_n = np.concatenate([batch.act[:,i]] * len(j_list), axis=0) #(bs*j, )            
+                obs_n = np.concatenate(obs_j_list, axis=0) #(bs*j, obs_dim), where j = len(j_list)
 
-                # info_n = np.concatenate((obs_n, np.expand_dims(act_n, axis=-1)), axis=1) #(bs*j, obs_dim+1)                
-                # self.history_buffer[i].append(info_n)
-
-                history_list = self.history_buffer[i][-self.wm_memory_size:] # (memory_size, bs*j, obs_dim)
-                hist_n = np.concatenate(history_list, axis=1) #(memory_size*bs*j, obs_dim)
-                inputs = to_torch(hist_n, device=self.world_models[i].device, dtype=torch.float)
+                act_n = np.concatenate([batch.act[:,i]] * len(j_list), axis=0) #(bs*j, )                                              
+                inputs = np.concatenate((obs_n, np.expand_dims(act_n, axis=-1)), axis=1) #(bs*j, obs_dim+1)
+                inputs = to_torch(inputs, device=self.world_models[i].device, dtype=torch.float)
                 # duplicate obs_next_i j times and concatenate them as the ground truth
                 true_next_obs_n = np.concatenate([batch.obs_next[:,i]] * len(j_list), axis=0) #(bs*j, obs_dim)
                 true_next_obs_n = to_torch(true_next_obs_n, device=self.world_models[i].device, dtype=torch.float)
@@ -335,8 +313,7 @@ class SACDMultiWMPolicyNewIM(BasePolicy):
                     # maximizing losses in these cases: 1) intr rew from adversaries only; 2) ma curiosity
                     intr_rew[:, i] += 1 / len(j_list) * pred_losses.sum(dim=1).detach().cpu().numpy()
                 elif self.intr_rew_options == 'new_im_both':                    
-                    intr_rew[:, i] += 1 / len(j_list) * (pred_losses[:, :self.num_adv].sum(dim=1) - pred_losses[:, self.num_adv:].sum(dim=1)).detach().cpu().numpy()
-                    #print(f"old IM values {1 / len(j_list) * (pred_losses[:, :self.num_adv].sum(dim=1) - pred_losses[:, self.num_adv:].sum(dim=1)).detach().cpu().numpy()}")
+                    intr_rew[:, i] += 1 / len(j_list) * (pred_losses[:, :self.num_adv].sum(dim=1) - pred_losses[:, self.num_adv:].sum(dim=1)).detach().cpu().numpy()                    
                     intr_rew[:, i] -= self.random_target_rew
                 elif self.intr_rew_options == 'new_im_team' or self.intr_rew_options == 'new_im_adv':
                     intr_rew[:, i] += 1 / len(j_list) * -pred_losses.sum(dim=1).detach().cpu().numpy()
@@ -420,8 +397,7 @@ class SACDMultiWMPolicyNewIM(BasePolicy):
             target_qs = torch.cat(target_qs, dim=1)
         return target_qs
 
-    def learn(self, batch: Batch, indice: np.array, **kwargs) -> Dict[str, float]:
-        breakpoint()
+    def learn(self, batch: Batch, indice: np.array, **kwargs) -> Dict[str, float]:        
         total_actor_loss = np.zeros(len(self.actors))
         total_critic1_loss = np.zeros(len(self.critic1s))
         total_critic2_loss = np.zeros(len(self.critic2s))
@@ -468,14 +444,7 @@ class SACDMultiWMPolicyNewIM(BasePolicy):
             actor_optim.step()
             
             world_model = self.world_models[i]
-            obs_n = batch.obs[:, i]
-            act_n = batch.act[:, i]
-            info_n = np.concatenate((obs_n, np.expand_dims(act_n, axis=-1)), axis=1) #(bs*j, obs_dim+1)                
-            self.history_buffer[i].append(info_n)
-            history_list = self.history_buffer[i][-self.wm_memory_size:] # (memory_size, bs*j, obs_dim)
-            #breakpoint()
-            inputs = np.concatenate(history_list, axis=1) #(memory_size*bs*j, obs_dim)
-            print(f"inputs.shape: {inputs.shape}")            
+            inputs = np.concatenate((batch.obs[:, i], np.expand_dims(batch.act[:, i], axis=-1)), axis=1)
             pred_next_obs = world_model(to_torch(inputs, device=world_model.device, dtype=torch.float))
             true_next_obs = to_torch(batch.obs_next[:, i], device=world_model.device, dtype=torch.float)
             wm_loss = F.mse_loss(pred_next_obs, true_next_obs)
