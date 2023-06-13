@@ -58,3 +58,29 @@ CUDA_VISIBLE_DEVICES=7 python train_multi_sacd_cond.py --task simple_push_in --n
 
 ## Conditioning on behavior
 CUDA_VISIBLE_DEVICES=8 python train_multi_sacd_embed_cond.py --task simple_spread_in --num-good-agents 5 --obs-radius 0.5 --intr-rew elign_team --epoch 50 --save-models --benchmark  --logdir log/simple_spread_embed_cond_elign_team
+
+
+
+
+
+
+
+
+
+
+
+## Varying the number of agents in hetero cooperative scenario: 4,8 (already did 6)
+CUDA_VISIBLE_DEVICES=0 python train_multi_sacd_cond.py --task hetero_spread_in --num-good-agents 4 --obs-radius 0.5 --intr-rew elign_team --epoch 50 --save-models --benchmark  --logdir log/hetero_spread_cond_elign_team_numagents4 # check
+CUDA_VISIBLE_DEVICES=1 python train_multi_sacd_cond.py --task hetero_spread_in --num-good-agents 8 --obs-radius 0.5 --intr-rew elign_team --epoch 50 --save-models --benchmark  --logdir log/hetero_spread_cond_elign_team_numagents8 # check
+CUDA_VISIBLE_DEVICES=2 python train_multi_sacd_cond.py --task simple_adversary_in --num-good-agents 6 --num-adversaries 3 --obs-radius 0.5 --intr-rew elign_team --epoch 50 --save-models --benchmark  --logdir log/simple_adversary_cond_elign_team_numagents6 # check
+CUDA_VISIBLE_DEVICES=3 python train_multi_sacd_cond.py --task simple_adversary_in --num-good-agents 8 --num-adversaries 4 --obs-radius 0.5 --intr-rew elign_team --epoch 50 --save-models --benchmark  --logdir log/simple_adversary_cond_elign_team_numagents8 # check
+
+## Varying the number of hidden layers in the world model:  4, 8
+CUDA_VISIBLE_DEVICES=4 python train_multi_sacd_cond.py --task hetero_spread_in --num-good-agents 6 --obs-radius 0.5 --intr-rew elign_team --epoch 50 --save-models --benchmark  --layer-num 4 --logdir log/hetero_spread_cond_elign_team_num_layers4 # check
+CUDA_VISIBLE_DEVICES=5 python train_multi_sacd_cond.py --task hetero_spread_in --num-good-agents 6 --obs-radius 0.5 --intr-rew elign_team --epoch 50 --save-models --benchmark  --layer-num 8 --logdir log/hetero_spread_cond_elign_team_num_layers8 # check
+CUDA_VISIBLE_DEVICES=6 python train_multi_sacd_cond.py --task simple_adversary_in --num-good-agents 4 --num-adversaries 2 --obs-radius 0.5 --intr-rew elign_team --epoch 50 --save-models --benchmark  --layer_num 4 --logdir log/simple_adversary_cond_elign_team_num_layers4
+CUDA_VISIBLE_DEVICES=7 python train_multi_sacd_cond.py --task simple_adversary_in --num-good-agents 4 --num-adversaries 2 --obs-radius 0.5 --intr-rew elign_team --epoch 50 --save-models --benchmark  --layer_num 8 --logdir log/simple_adversary_cond_elign_team_num_layers8
+
+
+
+
